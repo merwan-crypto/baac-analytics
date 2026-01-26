@@ -1,0 +1,6 @@
+setuptools
+matplotlib
+numpy
+pandas
+seaborn
+streamlit
