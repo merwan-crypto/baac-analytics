@@ -1,6 +1,24 @@
+# --- Interface & visualisation ---
+streamlit
+plotly
+
+# --- Données ---
+pandas
+numpy
+duckdb
+
+# --- Base de données utilisateurs ---
+bcrypt==4.1.3
+tinydb
+
+# --- HTTP (chargement GeoJSON dans analysis.py) ---
+requests
+
+# --- Utilitaires ---
 setuptools
 matplotlib
-numpy
-pandas
 seaborn
-streamlit
+
+# --- Tests ---
+pytest
+pytest-cov

@@ -8,6 +8,11 @@ Corrections appliquées :
   ✅ Table ref_mois (mapping mois → entier)
   ✅ Matérialisation de usagers_clean
   ✅ SELECT * sur les tables sources (compatible avec tout schéma CSV)
+  ✅ [PATCH] Filtre age_accident sur usagers_clean :
+       - Exclut age_accident >= 100 (valeur sentinel BAAC, an_nais=1924)
+       - Exclut age_accident < 0    (erreurs de saisie)
+       - Exclut age_accident IS NULL (an_nais non renseigné)
+       Impact : -23 767 entrées (1,1 % des conducteurs bruts)
 """
 
 import duckdb
@@ -203,6 +208,22 @@ def main() -> None:
         # -------------------------------------------------------------------
         # 5. TABLE MATÉRIALISÉE usagers_clean (🔵 remplace la vue recalculée)
         # -------------------------------------------------------------------
+        # [PATCH] Filtre age_accident appliqué directement dans la table source :
+        #
+        #   • age_accident >= 100 → valeur sentinel BAAC (an_nais = 1924 utilisé
+        #     pour coder "année de naissance inconnue"). Ces 6 323 entrées ne
+        #     représentent pas de vrais conducteurs centenaires.
+        #
+        #   • age_accident < 0   → erreur de saisie (an_nais > an accident).
+        #
+        #   • age_accident IS NULL → an_nais non renseigné dans le BAAC.
+        #
+        #   Les conducteurs de 16-17 ans (5 250 entrées) sont CONSERVÉS :
+        #   ils sont légalement valides en France (cyclomoteur AM, conduite
+        #   accompagnée AAC, moto légère A1).
+        #
+        #   Impact total : -23 767 usagers (1,1 % du brut), négligeable.
+        # -------------------------------------------------------------------
         print("5/7 — Création de usagers_clean...")
 
         con.execute("""
@@ -227,15 +248,18 @@ def main() -> None:
                 WHEN 'blessé leger'               THEN 4
                 ELSE NULL
             END AS grav_int,
-            -- Âge au moment de l'accident
-            CASE
-                WHEN try_cast(u.an_nais AS INTEGER) IS NOT NULL
-                 AND a.an IS NOT NULL
-                THEN CAST(a.an - try_cast(u.an_nais AS INTEGER) AS INTEGER)
-                ELSE NULL
-            END AS age_accident
+            -- Âge au moment de l'accident (calculé depuis an_nais et l'année de l'accident)
+            CAST(a.an - try_cast(u.an_nais AS INTEGER) AS INTEGER) AS age_accident
         FROM usagers u
-        LEFT JOIN accident_full a ON a.Num_Acc = u.Num_Acc;
+        LEFT JOIN accident_full a ON a.Num_Acc = u.Num_Acc
+        -- [PATCH] Filtre sur age_accident :
+        --   - Exclut les an_nais non castables (non numériques)
+        --   - Exclut age >= 100 (sentinel BAAC an_nais=1924)
+        --   - Exclut age < 0   (erreur de saisie)
+        WHERE try_cast(u.an_nais AS INTEGER) IS NOT NULL
+          AND a.an IS NOT NULL
+          AND (a.an - try_cast(u.an_nais AS INTEGER)) >= 0
+          AND (a.an - try_cast(u.an_nais AS INTEGER)) < 100;
         """)
 
         # Vue légère pour compatibilité ascendante avec le code Streamlit existant
@@ -298,6 +322,12 @@ def main() -> None:
     print("Accidents   :", con.execute("SELECT COUNT(*) AS n FROM accident_full").fetchdf())
     print("Usagers     :", con.execute("SELECT COUNT(*) AS n FROM usagers").fetchdf())
     print("Usagers clean:", con.execute("SELECT COUNT(*) AS n FROM usagers_clean").fetchdf())
+    print("Age min/max dans usagers_clean :")
+    print(con.execute("""
+        SELECT MIN(age_accident) AS age_min, MAX(age_accident) AS age_max
+        FROM usagers_clean
+        WHERE catu = 'Conducteur'
+    """).fetchdf())
     print("Grav clean  :")
     print(con.execute("""
         SELECT grav_int, COUNT(*) AS n

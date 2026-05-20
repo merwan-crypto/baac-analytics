@@ -1,50 +1,138 @@
-# Projet Streamlit : Template de démarrage
+# 🚗 Projet Fil Rouge – Analyse des accidents routiers
 
-## Auteurs
+## 📌 Objectif du projet
 
-*Marouan K. : marouan@datarockstars.ai*
+Ce projet consiste à développer une application permettant d’explorer et d’analyser les données d’accidents routiers en France.
 
-*Bilel O. : bilel@datarockstars.ai*
+L’objectif est de proposer une interface interactive permettant :
 
-*Matis C. : matis@datarockstars.ai*
+* d’analyser les tendances
+* de visualiser les données
+* d’explorer différents indicateurs liés aux accidents
 
-## Démarrage
+---
 
-- Naviguez jusqu'à ce dossier :
-  ```
-  cd projet-fil-rouge-{username_github}
-  ```
-- Vérifiez que vous voyez bien les fichiers de ce dépôt lorsque vous exécutez `ls`.
+## ⚙️ Technologies utilisées
 
-### MacOS / Linux
+* **Python**
+* **Streamlit** (interface web)
+* **DuckDB** (base de données analytique)
+* **SQLite** (gestion des utilisateurs)
+* **TinyDB** (préférences utilisateur)
+* **Pandas** (traitement des données)
 
-- Dans le terminal, exécutez la commande suivante pour démarrer le projet : 
-  ```
-  bash setup.sh
-  ```
-  Vous n'aurez pas à le faire les prochaines fois.
+---
 
-- Exécutez maintenant la commande suivante pour afficher le site crée à l'aide de Streamlit :
-  ```
-  bash run.sh
-  ```
+## 🚀 Fonctionnalités principales
 
-### Windows
+* 🔐 Authentification (connexion / inscription)
+* 📊 Tableau de bord interactif
+* 📈 Analyse des accidents (par période, gravité, etc.)
+* 👤 Gestion du profil utilisateur
+* 📂 Exploration des datasets
 
-Exécutez les commandes suivantes, dans l'ordre :
+---
 
-- Pour installer les librairies utiles et initialiser la base de données : 
-    ```
-    pip install --update pip
-    pip install -r requirements.txt
-    python3 setup.py
-    ```
+## 📁 Structure du projet
 
-- Pour lancer votre application Streamlit :
-    ```
-    streamlit run main.py
-    ```
+```text
+projet-fil-rouge-merwan-crypto/
+│
+├── main.py                # Point d’entrée de l’application
+├── requirements.txt       # Dépendances Python
+├── README.md              # Présentation du projet
+│
+├── data/                  # Données et bases
+│   ├── accidents.duckdb
+│   ├── users.db
+│   ├── user_preferences.json
+│
+├── docs/                  # Documentation technique
+│   ├── mvc.md
+│   └── structure.md
+│
+├── scripts/               # Scripts techniques
+│   ├── init_db.py         # Création de la base DuckDB
+│   └── inject_2009.py     # Correction / enrichissement des données
+│
+├── src/                   # Code source (architecture MVC)
+│   ├── controllers/
+│   ├── models/
+│   ├── views/
+│   ├── utils/
+│   ├── config/
+│   └── assets/
+│
+└── tests/                 # Tests (optionnel)
+```
 
-## Documentation
+---
 
-Une documentation vous permettant de bien démarrer et de comprendre le code est mise à votre disposition dans le répertoire `docs` de ce même projet.
+## 🧠 Architecture
+
+Le projet suit une architecture de type **MVC (Model - View - Controller)** :
+
+* **Models** : gestion des données (DuckDB, SQLite)
+* **Views** : interface utilisateur (Streamlit)
+* **Controllers** : logique métier et traitement
+
+---
+
+## 💻 Installation
+
+1. Cloner le projet ou extraire l’archive
+
+2. Installer les dépendances :
+
+```bash
+pip install -r requirements.txt
+```
+
+---
+
+## ▶️ Lancement de l’application
+
+```bash
+streamlit run main.py
+```
+
+---
+
+## 📊 Données
+
+Les données utilisées proviennent de bases d’accidents routiers.
+
+* Stockage principal : **DuckDB**
+* Sources : fichiers CSV nettoyés et agrégés
+
+---
+
+## 🔧 Scripts disponibles
+
+* `init_db.py`
+  → Permet de recréer la base DuckDB à partir des fichiers CSV
+
+* `inject_2009.py`
+  → Permet d’ajouter/corriger certaines données dans les fichiers sources
+
+---
+
+## ⚠️ Remarques
+
+* Les fichiers `__pycache__` ne sont pas inclus (générés automatiquement par Python)
+* Le fichier de session est réinitialisé automatiquement au lancement
+
+---
+
+## 👤 Auteur
+
+Projet réalisé dans le cadre d’un projet fil rouge en data / développement.
+
+---
+
+## 📌 Améliorations possibles
+
+* Ajout de visualisations plus avancées
+* Optimisation des performances
+* Ajout de tests unitaires complets
+* Déploiement en ligne

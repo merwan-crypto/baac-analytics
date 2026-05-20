@@ -1,13 +1,14 @@
+import os
+import json
 import streamlit as st
-from src.controllers.auth import logout
-from src.router import redirect
+from src.config.constants import SESSION_PATH
+
 
 def load_view():
-    """
-    Vue de déconnexion.
-    Responsabilités :
-    - Appeler le contrôleur de déconnexion
-    - Rediriger vers la page de login
-    """
-    result = logout()  # Appel au contrôleur
-    redirect("/login", reload=True)
+    if os.path.exists(SESSION_PATH):
+        with open(SESSION_PATH, "w", encoding="utf-8") as f:
+            json.dump({"email": ""}, f)
+
+    st.session_state.clear()
+    st.query_params["nav"] = "/login"
+    st.rerun()
