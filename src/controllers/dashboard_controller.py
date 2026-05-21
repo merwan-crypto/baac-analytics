@@ -32,7 +32,7 @@ def fetch_list(sql: str) -> list:
 # ---------------------------------------------------------------------------
 def get_dimensions() -> dict:
     annees = fetch_list("SELECT an FROM dim_annees")
-    deps = fetch_list("SELECT dep FROM dim_deps")
+    deps = fetch_list("SELECT dep FROM dim_deps WHERE dep != '20'")
     lum_vals = fetch_list("SELECT lum FROM dim_lum")
     atm_vals = fetch_list("SELECT atm FROM dim_atm")
     col_vals = fetch_list("SELECT col FROM dim_col")
