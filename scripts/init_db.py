@@ -218,7 +218,7 @@ def main() -> None:
         #
         #   • age_accident IS NULL → an_nais non renseigné dans le BAAC.
         #
-        #   Les conducteurs de 16-17 ans (5 250 entrées) sont CONSERVÉS :
+        #   Les conducteurs de 16-17 ans (50 500 entrées) sont CONSERVÉS :
         #   ils sont légalement valides en France (cyclomoteur AM, conduite
         #   accompagnée AAC, moto légère A1).
         #
