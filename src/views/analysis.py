@@ -364,7 +364,7 @@ def load_view():
             "⚠️ Note méthodologique : 6 323 entrées avec an_nais = 1924 ont été exclues, "
             "car cette valeur est utilisée comme code sentinel dans le BAAC pour indiquer "
             "une année de naissance inconnue (et non de vrais conducteurs centenaires). "
-            "Les conducteurs de 16–17 ans (5 250 entrées) sont conservés : "
+            "Les conducteurs de 16–17 ans (50 500 entrées) sont conservés : "
             "ils correspondent à des usagers légalement habilités à conduire en France "
             "(cyclomoteur AM, conduite accompagnée AAC, moto légère A1)."
         )
