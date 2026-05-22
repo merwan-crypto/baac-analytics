@@ -1,10 +1,11 @@
 from tinydb import TinyDB, Query
 import os
 
-# dossier data propre
-os.makedirs("data", exist_ok=True)
+from src.config.constants import PREFERENCES_PATH
 
-db = TinyDB("data/user_preferences.json")
+os.makedirs(os.path.dirname(PREFERENCES_PATH), exist_ok=True)
+
+db = TinyDB(PREFERENCES_PATH)
 users_table = db.table("users")
 
 
