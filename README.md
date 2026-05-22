@@ -53,7 +53,7 @@ projet-fil-rouge-merwan-crypto/
 │
 ├── scripts/               # Scripts techniques
 │   ├── init_db.py         # Création de la base DuckDB
-│   └── inject_2009.py     # Correction / enrichissement des données
+
 │
 ├── src/                   # Code source (architecture MVC)
 │   ├── controllers/
@@ -112,7 +112,7 @@ Les données utilisées proviennent de bases d’accidents routiers.
 * `init_db.py`
   → Permet de recréer la base DuckDB à partir des fichiers CSV
 
-* `inject_2009.py`
+
   → Permet d’ajouter/corriger certaines données dans les fichiers sources
 
 ---
