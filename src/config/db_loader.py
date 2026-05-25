@@ -1,6 +1,7 @@
 import os
 import zipfile
 import requests
+import streamlit as st
 
 DUCKDB_PATH = "/tmp/accidents.duckdb"
 ZIP_PATH = "/tmp/accidents.duckdb.zip"
@@ -16,6 +17,9 @@ def ensure_db():
             return
         os.remove(DUCKDB_PATH)
 
+    placeholder = st.empty()
+    placeholder.info("⏳ Chargement de la base de données... (première visite, ~30s)")
+
     response = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=300)
     response.raise_for_status()
 
@@ -27,3 +31,4 @@ def ensure_db():
         z.extract("accidents.duckdb", "/tmp")
 
     os.remove(ZIP_PATH)
+    placeholder.empty()
