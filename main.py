@@ -5,6 +5,13 @@ import streamlit as st
 from src.config.db_loader import ensure_db
 ensure_db()  # doit être appelé avant toute connexion DuckDB
 
+from src.config.db_loader import ensure_db
+ensure_db()
+
+# Force le clear du cache resource au démarrage (fix déploiement)
+import streamlit as st
+st.cache_resource.clear()
+
 from src.views import home, dataset, analysis, conclusion, login, logout, profile
 from src.router import get_route
 from src.config.constants import SESSION_PATH
