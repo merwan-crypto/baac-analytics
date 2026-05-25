@@ -6,3 +6,5 @@ matplotlib==3.10.7
 seaborn==0.13.2
 duckdb==1.4.4
 requests
+tinydb
+bcrypt
