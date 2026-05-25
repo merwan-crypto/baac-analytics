@@ -2,13 +2,11 @@ import json
 import os
 import streamlit as st
 
-from src.config.db_loader import ensure_db
-ensure_db()  # doit être appelé avant toute connexion DuckDB
+st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
 
 from src.config.db_loader import ensure_db
 ensure_db()
 
-# Force le clear du cache resource au démarrage (fix déploiement)
 import streamlit as st
 st.cache_resource.clear()
 
@@ -16,8 +14,6 @@ from src.views import home, dataset, analysis, conclusion, login, logout, profil
 from src.router import get_route
 from src.config.constants import SESSION_PATH
 import utils as utl
-
-st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
 
 utl.inject_custom_css()
 utl.navbar_component()
