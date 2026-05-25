@@ -4,9 +4,6 @@ import streamlit as st
 
 st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
 
-from src.config.db_loader import ensure_db
-ensure_db()
-
 from src.views import home, dataset, analysis, conclusion, login, logout, profile
 from src.router import get_route
 import utils as utl
@@ -14,18 +11,14 @@ import utils as utl
 utl.inject_custom_css()
 utl.navbar_component()
 
-
 def load_session() -> dict:
     existing_email = st.session_state.get("user_email", "")
     if existing_email:
         return {"email": existing_email}
-
     base_dir = os.path.dirname(os.path.abspath(__file__))
     session_path = os.path.join(base_dir, "data", "session.json")
-
     if not os.path.exists(session_path):
         return {"email": ""}
-
     try:
         with open(session_path, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -36,8 +29,10 @@ def load_session() -> dict:
     except (json.JSONDecodeError, OSError):
         return {"email": ""}
 
-
 def navigation():
+    from src.config.db_loader import ensure_db
+    ensure_db()  # ← ici, APRÈS que Streamlit a démarré
+
     session_data = load_session()
     email = session_data.get("email", "")
 
@@ -64,6 +59,5 @@ def navigation():
         logout.load_view()
     else:
         home.load_view()
-
 
 navigation()
