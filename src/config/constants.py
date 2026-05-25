@@ -20,12 +20,7 @@ _PROJECT_DIR = os.path.dirname(_SRC_DIR)                     # racine projet
 
 # Détecte si on est sur Streamlit Cloud ou en local
 _IS_CLOUD = os.path.exists("/mount/src")
-
-if _IS_CLOUD:
-    DUCKDB_PATH = "/tmp/accidents.duckdb"
-else:
-    DUCKDB_PATH = os.path.join(_PROJECT_DIR, "data", "accidents.duckdb")
-    
+DUCKDB_PATH = "/tmp/accidents.duckdb" if _IS_CLOUD else os.path.join(_PROJECT_DIR, "data", "accidents.duckdb")
 SESSION_PATH     = os.path.join(_PROJECT_DIR, "data", "session.json")
 USERS_DB_PATH    = os.path.join(_PROJECT_DIR, "data", "users.db")
 PREFERENCES_PATH = os.path.join(_PROJECT_DIR, "data", "user_preferences.json")
