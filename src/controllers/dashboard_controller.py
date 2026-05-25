@@ -11,6 +11,8 @@ DB_PATH = DUCKDB_PATH
 # ---------------------------------------------------------------------------
 @st.cache_resource
 def get_con():
+    from src.config.db_loader import ensure_db
+    ensure_db()  # garantit que le fichier existe avant de connecter
     return duckdb.connect(DB_PATH, read_only=True)
 
 
