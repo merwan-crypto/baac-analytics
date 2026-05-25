@@ -2,6 +2,9 @@ import json
 import os
 import streamlit as st
 
+from src.config.db_loader import ensure_db
+ensure_db()  # doit être appelé avant toute connexion DuckDB
+
 from src.views import home, dataset, analysis, conclusion, login, logout, profile
 from src.router import get_route
 from src.config.constants import SESSION_PATH
