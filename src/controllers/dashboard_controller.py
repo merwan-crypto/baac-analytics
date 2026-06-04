@@ -11,9 +11,19 @@ DB_PATH = DUCKDB_PATH
 # ---------------------------------------------------------------------------
 @st.cache_resource
 def get_con():
+    import os
     from src.config.db_loader import ensure_db
     ensure_db()  # garantit que le fichier existe avant de connecter
-    return duckdb.connect(DB_PATH, read_only=True)
+
+    # Plafonne la memoire DuckDB pour eviter l'OOM sur la free tier.
+    # DuckDB travaille sur disque (spilling) au lieu de tout charger en RAM.
+    config = {"memory_limit": "512MB", "threads": "2"}
+    if os.path.exists("/mount/src"):
+        tmp_dir = "/tmp/duckdb_tmp"
+        os.makedirs(tmp_dir, exist_ok=True)
+        config["temp_directory"] = tmp_dir
+
+    return duckdb.connect(DB_PATH, read_only=True, config=config)
 
 
 # ---------------------------------------------------------------------------
