@@ -8,9 +8,10 @@ import utils as utl
 
 st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
 
-utl.inject_custom_css()
-utl.navbar_component()
-
+# utl.inject_custom_css()
+# utl.navbar_component()
+import streamlit as _st_diag
+_st_diag.info("DIAGNOSTIC : si tu vois ce message, le rendu Streamlit fonctionne.")
 
 def load_session():
     if not os.path.exists("session.json"):
