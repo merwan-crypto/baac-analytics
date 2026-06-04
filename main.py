@@ -2,52 +2,38 @@ import json
 import os
 import streamlit as st
 
-st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
-
 from src.views import home, dataset, analysis, conclusion, login, logout, profile
-from src.router import get_route
+from src.router import get_route, redirect
 import utils as utl
+
+st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
 
 utl.inject_custom_css()
 utl.navbar_component()
 
-def load_session() -> dict:
-    existing_email = st.session_state.get("user_email", "")
-    if existing_email:
-        return {"email": existing_email}
-    base_dir = os.path.dirname(os.path.abspath(__file__))
-    session_path = os.path.join(base_dir, "data", "session.json")
-    if not os.path.exists(session_path):
-        return {"email": ""}
-    try:
-        with open(session_path, "r", encoding="utf-8") as f:
-            data = json.load(f)
-            email = data.get("email", "")
-            if email and isinstance(email, str) and "@" in email:
-                return {"email": email}
-            return {"email": ""}
-    except (json.JSONDecodeError, OSError):
-        return {"email": ""}
+
+def load_session():
+    if not os.path.exists("session.json"):
+        with open("session.json", "w", encoding="utf-8") as outfile:
+            json.dump({"email": ""}, outfile)
+
+    with open("session.json", "r", encoding="utf-8") as json_file:
+        return json.load(json_file)
+
 
 def navigation():
-    from src.config.db_loader import ensure_db
-    ensure_db()  # ← ici, APRÈS que Streamlit a démarré
-
-    session_data = load_session()
-    email = session_data.get("email", "")
-
-    if email and not st.session_state.get("user_email"):
-        st.session_state["user_email"] = email
-    elif st.session_state.get("user_email") and not email:
-        email = st.session_state["user_email"]
-
+    SESSION = load_session()
     route = get_route()
 
-    if not email:
-        login.load_view()
+    if SESSION.get("email", "") == "" and route != "/login":
+        redirect("login")
         return
 
-    if route == "/dataset":
+    if route == "/home":
+        home.load_view()
+    elif route == "/goal":
+        dataset.load_view()
+    elif route == "/dataset":
         dataset.load_view()
     elif route == "/analysis":
         analysis.load_view()
@@ -57,7 +43,10 @@ def navigation():
         profile.load_view()
     elif route == "/logout":
         logout.load_view()
+    elif route == "/login":
+        login.load_view()
     else:
         home.load_view()
+
 
 navigation()

@@ -1,9 +1,9 @@
 import os
+import shutil
 import zipfile
 import requests
 import streamlit as st
 
-# En local on utilise le vrai fichier, sur le cloud on télécharge
 _IS_CLOUD = os.path.exists("/mount/src")
 
 if _IS_CLOUD:
@@ -21,45 +21,47 @@ GITHUB_RELEASE_URL = (
     "releases/download/v1.0-data/accidents.duckdb.zip"
 )
 
+_MIN_DB_SIZE = 50 * 1024 * 1024
+
 
 def ensure_db():
     if not _IS_CLOUD:
-        return  # En local le fichier existe déjà
+        return
 
-    # Base déjà présente et valide ?
-    if os.path.exists(DUCKDB_PATH) and os.path.getsize(DUCKDB_PATH) > 1024 * 1024:
+    if os.path.exists(DUCKDB_PATH) and os.path.getsize(DUCKDB_PATH) > _MIN_DB_SIZE:
         return
     if os.path.exists(DUCKDB_PATH):
         os.remove(DUCKDB_PATH)
 
     placeholder = st.empty()
-    placeholder.info("⏳ Chargement de la base de données (~145 Mo, première visite uniquement)...")
+    placeholder.info("Chargement de la base de donnees (~145 Mo, premiere requete uniquement)...")
 
+    tmp_extract = DUCKDB_PATH + ".part"
     try:
-        # Téléchargement
-        response = requests.get(GITHUB_RELEASE_URL, stream=True, timeout=600)
-        response.raise_for_status()
-        with open(ZIP_PATH, "wb") as f:
-            for chunk in response.iter_content(chunk_size=8 * 1024 * 1024):
-                f.write(chunk)
+        with requests.get(GITHUB_RELEASE_URL, stream=True, timeout=600) as response:
+            response.raise_for_status()
+            with open(ZIP_PATH, "wb") as f:
+                for chunk in response.iter_content(chunk_size=8 * 1024 * 1024):
+                    if chunk:
+                        f.write(chunk)
 
-        # Extraction : on récupère le membre .duckdb quel que soit son chemin dans le zip
         with zipfile.ZipFile(ZIP_PATH, "r") as z:
-            duckdb_member = next(
-                (n for n in z.namelist() if n.endswith("accidents.duckdb")),
-                None,
-            )
-            if duckdb_member is None:
-                raise FileNotFoundError(
-                    f"Aucun 'accidents.duckdb' dans le zip. Contenu : {z.namelist()}"
-                )
-            # Extrait puis place le fichier exactement à DUCKDB_PATH
-            with z.open(duckdb_member) as src, open(DUCKDB_PATH, "wb") as dst:
-                dst.write(src.read())
+            member = next((n for n in z.namelist() if n.endswith("accidents.duckdb")), None)
+            if member is None:
+                raise FileNotFoundError("Pas de accidents.duckdb dans le zip")
+            with z.open(member) as src, open(tmp_extract, "wb") as dst:
+                shutil.copyfileobj(src, dst, length=8 * 1024 * 1024)
 
+        os.replace(tmp_extract, DUCKDB_PATH)
         os.remove(ZIP_PATH)
         placeholder.empty()
 
     except Exception as e:
-        placeholder.error(f"❌ Échec du chargement de la base : {type(e).__name__} — {e}")
+        for p in (tmp_extract, ZIP_PATH):
+            if p and os.path.exists(p):
+                try:
+                    os.remove(p)
+                except OSError:
+                    pass
+        placeholder.error(f"Echec du chargement de la base : {type(e).__name__} - {e}")
         raise
