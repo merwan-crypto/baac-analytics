@@ -15,13 +15,18 @@ def get_con():
     from src.config.db_loader import ensure_db
     ensure_db()  # garantit que le fichier existe avant de connecter
 
-    # Plafonne la memoire DuckDB pour eviter l'OOM sur la free tier.
-    # DuckDB travaille sur disque (spilling) au lieu de tout charger en RAM.
-    config = {"memory_limit": "512MB", "threads": "2"}
-    if os.path.exists("/mount/src"):
+    is_cloud = os.path.exists("/mount/src")
+
+    if is_cloud:
+        # Cloud : on bride DuckDB pour éviter l'OOM (free tier ~1GB RAM).
+        # DuckDB travaille sur disque (spilling) au lieu de tout charger en RAM.
+        config = {"memory_limit": "512MB", "threads": "2"}
         tmp_dir = "/tmp/duckdb_tmp"
         os.makedirs(tmp_dir, exist_ok=True)
         config["temp_directory"] = tmp_dir
+    else:
+        # Local : on laisse DuckDB respirer (RAM disponible sur la machine).
+        config = {"memory_limit": "4GB", "threads": "4"}
 
     return duckdb.connect(DB_PATH, read_only=True, config=config)
 
@@ -307,6 +312,7 @@ def get_collisions(where_sql: str, params: list) -> pd.DataFrame:
     return fetch_df(sql, params)
 
 
+@st.cache_data(show_spinner=False)
 def export_csv(where_sql: str, params: list) -> bytes:
     df = fetch_df(f"""
         SELECT Num_Acc, an, mois, jour, hrmn, dep, agg, catr, circ, plan, prof,

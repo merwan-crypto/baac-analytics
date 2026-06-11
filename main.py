@@ -1,5 +1,6 @@
 import json
 import os
+
 import streamlit as st
 
 st.set_page_config(layout="wide", page_title="Projet Fil Rouge")
@@ -14,11 +15,11 @@ utl.inject_custom_css()
 
 def render_navbar():
     items = "".join(
-        f'<li><a class="navitem" href="/?nav=%2F{v}">{k}</a></li>'
+        f'<li><a class="navitem" target="_top" href="/?nav=%2F{v}">{k}</a></li>'
         for k, v in NAVBAR_PATHS.items()
     )
     settings = "".join(
-        f'<a class="settingsNav" href="/?nav={v}">{k}</a>'
+        f'<a class="settingsNav" target="_top" href="/?nav={v}">{k}</a>'
         for k, v in SETTINGS.items()
     )
     navbar_html = f"""
@@ -33,12 +34,12 @@ def render_navbar():
       <nav class="navbar">
         <div class="nav-container">
           <div class="brand">
-            <a href="/?nav=%2Fhome" class="brand-link">🚗 Accidents FR</a>
+            <a href="/?nav=%2Fhome" target="_top" class="brand-link">🚗 Accidents FR</a>
           </div>
           <ul class="navlist">{items}</ul>
           <div class="nav-actions">
             <div class="dropdown">
-              <div class="dropbtn">⚙</div>
+              <div class="dropbtn">⚙️</div>
               <div class="dropdown-content">{settings}</div>
             </div>
           </div>
@@ -56,10 +57,12 @@ def load_session() -> dict:
     existing_email = st.session_state.get("user_email", "")
     if existing_email:
         return {"email": existing_email}
+
     base_dir = os.path.dirname(os.path.abspath(__file__))
     session_path = os.path.join(base_dir, "data", "session.json")
     if not os.path.exists(session_path):
         return {"email": ""}
+
     try:
         with open(session_path, "r", encoding="utf-8") as f:
             data = json.load(f)

@@ -417,11 +417,14 @@ def load_view():
 
         st.divider()
         st.subheader("⬇️ Télécharger le résultat filtré")
-        st.info("Conseil : applique au moins un filtre comme l’année ou le département pour accélérer l’export.")
+        st.caption("L’export n’est généré que lorsque tu cliques, pour garder l’app fluide.")
 
-        st.download_button(
-            "Télécharger CSV (filtré)",
-            data=export_csv(where_sql, params),
-            file_name="accidents_full_filtre.csv",
-            mime="text/csv",
-        )
+        if st.button("Préparer l’export CSV"):
+            with st.spinner("Génération du CSV..."):
+                csv_data = export_csv(where_sql, params)
+            st.download_button(
+                "Télécharger CSV (filtré)",
+                data=csv_data,
+                file_name="accidents_full_filtre.csv",
+                mime="text/csv",
+            )
